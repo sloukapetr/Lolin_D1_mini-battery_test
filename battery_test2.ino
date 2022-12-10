@@ -1,28 +1,30 @@
+// --- LIBRARIES INCLUDE ---
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <WEMOS_SHT3X.h>
 
+// --- DEFAULT SETTINGS ---
 #define ESP_ID          "1/1"
 
-#define WIFI_SSID           "GumaPetr"
-#define WIFI_PASSWORD       "Gottvaldovi77"
+#define WIFI_SSID           "SSID"
+#define WIFI_PASSWORD       "PASS"
 
 #define MQTT_SERVER         "192.168.10.1"
 
 #define MQTT_TOPIC_TEMPERATURE  "sensor/1-1/temperature" //sensor/ID/temperature - ID room: floor-room
 #define MQTT_TOPIC_HUMIDITY     "sensor/1-1/humidity"
 
-#define PUBLISH_RATE        10*60      // publishing rate in seconds (minute*60)
+#define PUBLISH_RATE        3      // int seconds
 #define SLEEP_MODE          false       // deep sleep then reset or idling (D0 must be connected to RST) https://github.com/nodemcu/nodemcu-devkit-v1.0
 
 #define DEBUG               true      // debug to serial port
 
+// Temperature 
 float t;
 float h;
 
 // --- LIBRARIES INIT ---
 WiFiClient    wifi;
-//PubSubClient  mqtt(MQTT_SERVER, 1883, wifi);
 PubSubClient client(wifi);
 SHT3X         sht30(0x45);
 
@@ -30,7 +32,6 @@ SHT3X         sht30(0x45);
 void setup_wifi() {
 
   delay(10);
-  // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to WiFi:");
   Serial.println(WIFI_SSID);
@@ -42,8 +43,6 @@ void setup_wifi() {
     delay(500);
     Serial.print(".");
   }
-
-  //randomSeed(micros());
 
   Serial.println();
   Serial.print("WiFi connected to");
@@ -62,7 +61,7 @@ void reconnect() {
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
-      // Once connected, publish an announcement...
+      // after connect
       //client.publish("outTopic", "hello world");
       //client.publish("inTopic", "intopic/22");
       // ... and resubscribe
@@ -78,11 +77,9 @@ void reconnect() {
 }
 
 void setup() {
-  //pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
   if (DEBUG) Serial.begin(9600);
   setup_wifi();
   client.setServer(MQTT_SERVER, 1883);
-  //client.setCallback(callback);
 }
 
 void loop() {
